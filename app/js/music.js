@@ -36,21 +36,13 @@ var body=$("body");
 
 //同步函数，获取本地音乐
 var fs =require("fs");
-var path = {
-  path:[
-    "/home/pcf/Music/",
-    "/home/pcf/Desktop/"
-  ]
-};
-fs.writeFileSync('./path.json',JSON.stringify(path));
-
-var musicDirs = JSON.parse(fs.readFileSync('./path.json')).path;
 var audio=document.createElement("audio");
 init();
 
 function init(){
   playList=[];
   playListSrc=[];
+  var musicDirs = JSON.parse(fs.readFileSync('./path.json')).path;
   for(var i=0,m=musicDirs.length;i<m;i++){
     var musicPaths=fs.readdirSync(musicDirs[i]);
     musicPaths=musicPaths.filter(function(item){

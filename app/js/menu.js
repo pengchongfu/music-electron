@@ -1,28 +1,30 @@
 const remote = require('electron').remote;
 const Menu = remote.Menu;
+const dialog = remote.dialog;
+const BrowserWindow = remote.BrowserWindow;
+
+var pathWin = null;
 
 var template = [
   {
     label: '音乐路径',
     submenu: [
       {
-        label: '查看所有音乐路径'
+        label: '查看所有音乐路径',
+        click:function(){
+          openPathWin();
+        }
       },
       {
         type: 'separator'
       },
       {
-        label: '添加音乐路径'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: "刷新列表",
+        label: '添加音乐路径',
         click: function(){
+          addPath();
           init();
         }
-      }
+      },
     ]
   },
   {
@@ -38,6 +40,9 @@ var template = [
         label: '关闭',
         accelerator: 'CmdOrCtrl+W',
         role: 'close'
+      },
+      {
+        type: 'separator'
       },
       {
         label: '主题',
@@ -78,3 +83,26 @@ var template = [
 
 var menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
+
+function addPath(){
+  var addPaths=dialog.showOpenDialog({ properties: [ 'openDirectory', 'multiSelections' ]});
+  addPaths=addPaths.map(function(item){
+    return item+='/';
+  });
+  
+  var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+  addPaths=addPaths.filter(function(item){
+    return originPaths.indexOf(item)===-1;
+  });
+  fs.writeFileSync('./path.json',JSON.stringify({path:originPaths.concat(addPaths)}));
+}
+
+function openPathWin(){
+  if(pathWin)return;
+  pathWin = new BrowserWindow({ width: 800, height: 600});
+  pathWin.webContents.openDevTools();
+  pathWin.loadURL('file://'+__dirname+'/pathWin.html');
+  pathWin.on('closed',function(){
+    pathWin=null;
+  })
+}
