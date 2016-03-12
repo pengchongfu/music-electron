@@ -1,4 +1,5 @@
 var playList=[];
+var playListSrc=[];
 var musicIcon=$("#musicIcon");
 var playState=document.getElementById("playState");
 var leftTime=document.getElementById("leftTime");
@@ -11,6 +12,8 @@ var pauseButton=document.getElementById("pauseButton");
 var nextButton=document.getElementById("nextButton");
 var listButton=document.getElementById("listButton");
 var list=$("#list");
+
+var body=$("body");
 
 //获取音乐列表信息
 // (function(){
@@ -33,12 +36,32 @@ var list=$("#list");
 
 //同步函数，获取本地音乐
 var fs =require("fs");
-var musicDir='/home/pcf/Music/';
+var path = {
+  path:[
+    "/home/pcf/Music/",
+    "/home/pcf/Desktop/"
+  ]
+};
+fs.writeFileSync('./path.json',JSON.stringify(path));
+
+var musicDirs = JSON.parse(fs.readFileSync('./path.json')).path;
 var audio=document.createElement("audio");
 init();
 
 function init(){
-  playList=fs.readdirSync(musicDir);
+  playList=[];
+  playListSrc=[];
+  for(var i=0,m=musicDirs.length;i<m;i++){
+    var musicPaths=fs.readdirSync(musicDirs[i]);
+    musicPaths=musicPaths.filter(function(item){
+      return item.indexOf(".mp3")!==-1;
+    });
+    for(var j=0,n=musicPaths.length;j<n;j++){
+      playList.push(musicPaths[j]);
+      playListSrc.push(musicDirs[i]);
+    }
+  }
+
   $('ul li').remove();
   playList.map(function(item){
       list.append("<li>"+item+"</li>");
@@ -55,15 +78,9 @@ function init(){
     updateState();
   });
   audio.index=0;
-  audio.src=musicDir+playList[audio.index];
+  audio.src=playListSrc[audio.index]+playList[audio.index];
   updateState();
 }
-
-var refreshButton = $("#refreshButton");
-refreshButton.click(function(){
-  init();
-});
-
 
 process.click(changeProcess);
 previousButton.addEventListener('click',previousSong);
@@ -101,7 +118,7 @@ function nextSong(){
 }
 
 function switchSong(){
-    audio.src=musicDir+playList[audio.index];
+    audio.src=playListSrc[audio.index]+playList[audio.index];
     audio.play();
 }
 
