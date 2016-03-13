@@ -150,7 +150,13 @@ audio.addEventListener("timeupdate",function(){
     leftTime.innerHTML=str;
 });
 
-function formatTime(second) {
-    return [parseInt(second / 60 / 60), second / 60 % 60, second % 60].join(":")
-        .replace(/\b(\d)\b/g, "0$1");
-}
+audio.addEventListener("loadedmetadata",function(){
+  var persent=audio.currentTime/audio.duration;
+  var left=audio.duration-audio.currentTime;
+  var min=parseInt(left/60);
+  var sec=parseInt(left%60);
+  var str="-"+min+":"+sec;
+  if(sec<10)str="-"+min+":0"+sec;
+  bar.css("width",persent*100+"%");
+  leftTime.innerHTML=str;
+});

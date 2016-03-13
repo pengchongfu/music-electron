@@ -10,20 +10,15 @@ var template = [
     label: '音乐路径',
     submenu: [
       {
-        label: '查看所有音乐路径',
-        click:function(){
-          openPathWin();
-        }
+        label: '查看音乐路径',
+        click: openPathWin
       },
       {
         type: 'separator'
       },
       {
         label: '添加音乐路径',
-        click: function(){
-          addPath();
-          init();
-        }
+        click: addPath
       },
     ]
   },
@@ -50,13 +45,13 @@ var template = [
           {
             label:"亮色",
             click:function(){
-              body.css('background','#ee2c2c');
+              body.css('background','#f0e68c');
             }
           },
           {
             label:"暗色",
             click:function(){
-              body.css('background','#606060');
+              body.css('background','#a9a9a9');
             }
           },
           {
@@ -85,24 +80,34 @@ var menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
 function addPath(){
-  var addPaths=dialog.showOpenDialog({ properties: [ 'openDirectory', 'multiSelections' ]});
-  addPaths=addPaths.map(function(item){
-    return item+='/';
+  dialog.showOpenDialog(BrowserWindow.getFocusedWindow(),{ properties: [ 'openDirectory', 'multiSelections' ]},function(addPaths){
+    addPaths=addPaths.map(function(item){
+      return item+='/';
+    });
+  
+    var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+    addPaths=addPaths.filter(function(item){
+      return originPaths.indexOf(item)===-1;
+    });
+    if(addPaths.length){
+      fs.writeFileSync('./path.json',JSON.stringify({path:originPaths.concat(addPaths)}));
+      init();
+    }
   });
   
-  var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
-  addPaths=addPaths.filter(function(item){
-    return originPaths.indexOf(item)===-1;
-  });
-  fs.writeFileSync('./path.json',JSON.stringify({path:originPaths.concat(addPaths)}));
 }
 
 function openPathWin(){
   if(pathWin)return;
-  pathWin = new BrowserWindow({ width: 800, height: 600});
-  pathWin.webContents.openDevTools();
+  pathWin = new BrowserWindow({ width: 300, height: 600,minWidth:300,minHeight:600});
   pathWin.loadURL('file://'+__dirname+'/pathWin.html');
+  pathWin.setMenu(null);
+  Menu.setApplicationMenu(null);
+  var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
   pathWin.on('closed',function(){
     pathWin=null;
+    Menu.setApplicationMenu(menu);
+    var afterPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+    if(afterPaths.toString()!==originPaths.toString())init();
   })
 }

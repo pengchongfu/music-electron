@@ -2,10 +2,32 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>查看所有音乐路径</title>
+    <title>查看音乐路径</title>
+    <style>
+      body {
+        vertical-align: middle;
+        padding: 5px;
+        margin: 5px;
+        background: yellowgreen;
+        font: 20px "Lucida Grande", Helvetica, Arial, sans-serif;
+      }
+      button {
+        background: red;
+        text-align: center;
+        width: 75px;
+        border: 2px solid #eeeeee;
+        border-radius: 10px;
+      }
+      li {
+        list-style-type: none;
+        word-break: break-all;
+      }
+      ul {
+        -webkit-padding-start: 0;
+      }
+    </style>
   </head>
   <body>
-    <p>所有音乐路径：</p>
     <ul id="ul"></ul>
     <script type="text/javascript" src="js/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
     <script src="js/pathWin.js"></script>
