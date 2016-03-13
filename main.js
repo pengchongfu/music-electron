@@ -1,4 +1,5 @@
 'use strict';
+var fs = require("fs");
 
 const electron = require("electron");
 
@@ -21,7 +22,16 @@ function createWindow(){
     //mainWindow.webContents.openDevTools();
 
     mainWindow.loadURL("file://"+__dirname+"/app/music.html");
+    
+    mainWindow.on('closed',function(){
+      app.quit();
+    });
 
 }
+
+var configPath=process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+fs.exists(configPath+'/path.json',function(exist){
+  if(!exist)fs.writeFileSync(configPath+'/path.json',JSON.stringify({path:[]}));
+});
 
 app.on('ready',createWindow);

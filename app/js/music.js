@@ -15,6 +15,8 @@ var list=$("#list");
 
 var body=$("body");
 
+const remote = require('electron').remote;
+const configPath=remote.process.env[(remote.process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 //获取音乐列表信息
 // (function(){
 //   $.ajax(
@@ -42,7 +44,7 @@ init();
 function init(){
   playList=[];
   playListSrc=[];
-  var musicDirs = JSON.parse(fs.readFileSync('./path.json')).path;
+  var musicDirs = JSON.parse(fs.readFileSync(configPath+'/path.json')).path;
   for(var i=0,m=musicDirs.length;i<m;i++){
     var musicPaths=fs.readdirSync(musicDirs[i]);
     musicPaths=musicPaths.filter(function(item){

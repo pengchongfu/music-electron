@@ -1,10 +1,11 @@
-const remote = require('electron').remote;
+//const remote = require('electron').remote;
 const Menu = remote.Menu;
 const dialog = remote.dialog;
 const BrowserWindow = remote.BrowserWindow;
 
 var pathWin = null;
 
+//const configPath=remote.process.env[(remote.process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 var template = [
   {
     label: '音乐路径',
@@ -85,12 +86,12 @@ function addPath(){
       return item+='/';
     });
   
-    var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+    var originPaths=JSON.parse(fs.readFileSync(configPath+'/path.json')).path;
     addPaths=addPaths.filter(function(item){
       return originPaths.indexOf(item)===-1;
     });
     if(addPaths.length){
-      fs.writeFileSync('./path.json',JSON.stringify({path:originPaths.concat(addPaths)}));
+      fs.writeFileSync(configPath+'/path.json',JSON.stringify({path:originPaths.concat(addPaths)}));
       init();
     }
   });
@@ -103,11 +104,12 @@ function openPathWin(){
   pathWin.loadURL('file://'+__dirname+'/pathWin.html');
   pathWin.setMenu(null);
   Menu.setApplicationMenu(null);
-  var originPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+  //pathWin.webContents.openDevTools();
+  var originPaths=JSON.parse(fs.readFileSync(configPath+'/path.json')).path;
   pathWin.on('closed',function(){
     pathWin=null;
     Menu.setApplicationMenu(menu);
-    var afterPaths=JSON.parse(fs.readFileSync('./path.json')).path;
+    var afterPaths=JSON.parse(fs.readFileSync(configPath+'/path.json')).path;
     if(afterPaths.toString()!==originPaths.toString())init();
   })
 }
